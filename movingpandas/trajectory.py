@@ -8,6 +8,7 @@ from datetime import datetime
 from pandas import DataFrame, to_datetime
 from pandas.core.indexes.datetimes import DatetimeIndex
 from geopandas import GeoDataFrame
+import pyproj
 
 try:
     from pyproj import CRS
@@ -705,7 +706,9 @@ class Trajectory:
         if pt0 == pt1:
             return 0.0
         if self.is_latlon:
-            return calculate_initial_compass_bearing(pt0, pt1)
+            geodesic = pyproj.Geod(ellps='WGS84')
+            fwd_azimuth,back_azimuth,distance = geodesic.inv(pt0.x, pt0.y, pt1.x, pt1.y)
+            return fwd_azimuth
         else:
             return azimuth(pt0, pt1)
 
